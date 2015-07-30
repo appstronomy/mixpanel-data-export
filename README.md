@@ -89,6 +89,10 @@ It is recommended that you schedule this tool to run nightly. That way, you are 
 
 `ruby ./lib/mixpanel_data_export.rb`
 
+An illustration of what to expect when you run this command is below. Of course, your events will differ in name, number and quantity of data retrieved.
+
+![usage example](https://github.com/appstronomy/mixpanel-data-export/blob/master/Mixpanel%20Data%20Export.gif)
+
 ## Output Files
 
 A new directory is created for each day that the script is run. For example, if you run the script on July 30, 2016, you'll see a directory created with the name '2016-07-30'.
