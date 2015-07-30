@@ -1,0 +1,5 @@
+{
+  "certificate_authority": {
+    "cert_file_path": "/usr/local/etc/openssl/certs/cacert.pem"
+  }
+}
