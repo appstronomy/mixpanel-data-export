@@ -3,8 +3,8 @@ This tool has been written in Ruby and packaged as a project.  It is not a singl
 
 Note that while this tool was designed to help you export your event data from Mixpanel, it was not built by Mixpanel. 
 
-*All instructions that follow assume that you are in the project's root directory.
-*
+_All instructions that follow assume that you are in the project's root directory._
+
 ## Installation
 
 You should have Ruby 2.x installed, as well as Rubygems, including the Bundler gem. For help installing Ruby on your system, see [the official Ruby installation page](https://www.ruby-lang.org/en/documentation/installation/). For help with installing RubyGems, see [RubyGems Basics](http://guides.rubygems.org/rubygems-basics/).
@@ -101,23 +101,30 @@ A sibling directory is also created if need be, called 'logs'. Each day's run ap
 
 Similarly, the CSV files generated will always use today's date. Each event creates its own CSV file with data for just that event. If no data was downloaded for a particular event, then no CSV file is created for that event.
 
-## Programmer Documentation
+## Development
+### Programmer Documentation
 You can find module and class documentation in the `/doc` folder. Point your browser to the `index.html` file to get started.
 
 To regenerate the documentation, make sure you have the `yard` gem installed, and then from the root of this project, issue the `yardoc` command.
 
+### Enhancements
+Please open a new issue to discuss changes you'd like to make. We can coordinate before you make a pull request.
+
+### To-do
+This project does need unit tests. We only have placeholder files for [rspec](http://rspec.info/) based testing.
+
 ## Troubleshooting
 
-If you have any issues installing the gems via Bundler, you can try using Ruby 2.1.2, which was used to successfully compile finicky gems like Red Carpet on a Mac.
+If you have any issues installing the gems via Bundler, you can try using Ruby 2.1.2, which was used to successfully compile finicky gems like 'redcarpet' on a Mac.
 
 ## Changelog
 
-See the Changelog for a history of release notes.
+See the [Changelog](https://github.com/appstronomy/mixpanel-data-export/blob/master/Changelog.md) for a history of release notes.
 
 ## Collaborators and Maintainers
 
-Contributors
+See the [Contributors](https://github.com/appstronomy/mixpanel-data-export/graphs/contributors) page for details.
 
 ##Copyright
 
-Copyright (c) 2015+ Appstronomy, LLC. See [license] for details.
+Copyright (c) 2015+ [Appstronomy](http://appstronomy.com/), LLC. See [license](https://github.com/appstronomy/mixpanel-data-export/blob/master/LICENSE.txt) for details.
