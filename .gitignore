@@ -38,3 +38,4 @@ Gemfile.lock
 config/MixpanelCredentials.config.json
 config/SSL.config.json
 config/Exporter.config.json
+.idea
