@@ -1,0 +1,6 @@
+--protected
+--hide-void-return
+--markup-provider=redcarpet
+--markup=markdown
+
+- lib/mixpanel_data_export.rb
