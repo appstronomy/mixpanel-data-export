@@ -39,3 +39,6 @@ config/MixpanelCredentials.config.json
 config/SSL.config.json
 config/Exporter.config.json
 .idea
+config/MixpanelCredentials.config.beta.json
+config/MixpanelCredentials.config.appstore.json
+config/MixpanelCredentials.config.dev.json
