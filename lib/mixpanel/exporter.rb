@@ -120,12 +120,16 @@ module Mixpanel
     # Performs the actual CSV file creation from the given event, its data and
     # the header keys already identified.
     #
-    # @param  [String] event The name of the event whose data we will create a CSV file for.
-    # @param  [Array] data The array of JSON entries (each, effectively a Hash) containing raw property data.
+    # @param  [String] event  The name of the event whose data we will create a CSV file for.
+    # @param  [Array] data    The array of JSON entries (each, effectively a Hash) containing raw property data.
+    #                         It has two elements. The first is the key 'event', which points to the name of the event.
+    #                         The second key is called 'properties'. Its value is itself a Hash of key-value pairs
+    #                         which represent the actual event property data.
     # @param  [Array] headers The header keys that will also become the CSV file's columns.
     # @return [void]
     def create_csv(event, data, headers)
       file_path = csv_file_path event
+      headers.sort!
       @logger.info "Writing CSV file '#{file_path}'..."
       CSV.open(file_path, 'w') do |csv|
         # Write the header row. The first column will be the event itself.
@@ -134,11 +138,12 @@ module Mixpanel
         # Loop through each data point (event instance recorded).
         data.each do |data_point|
           # Build the iterated entry that will form a single row:
-          entry = [data_point['event']] + headers.map do |col|
-            if col == 'time'
-              Time.at(data_point['properties'][col].to_i).strftime('%Y-%m-%d %H:%M:%S')
+          event_properties = data_point['properties']
+          entry = [event] + headers.map do |property_key|
+            if property_key == 'time'
+              Time.at(event_properties[property_key].to_i).strftime('%Y-%m-%d %H:%M:%S')
             else
-              data_point['properties'][col].to_s
+              event_properties[property_key].to_s
             end
           end # map
 
@@ -241,5 +246,5 @@ end # module
 
 # ---------- Development Testing ----------
 
-#exporter = Mixpanel::Exporter.new
-#exporter.start
+exporter = Mixpanel::Exporter.new
+exporter.start
