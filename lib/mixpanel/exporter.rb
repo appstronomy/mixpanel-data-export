@@ -151,7 +151,8 @@ module Mixpanel
 
     # Provides the full file path we would write a new CSV file to, for the given event.
     # Assumptions
-    #   * We are using today as the date that the directory written to and the filename built, will use.
+    #   * We are using today as the date that the filename built, will use.
+    #   * If we were asked to create date specific subfolders, today's date will also be used for that.
     #
     # @param  [String] event The name of the event for which we are constructing an output file path.
     # @return [String] The full file path that can be written to.
@@ -178,15 +179,23 @@ module Mixpanel
 
     # Provides the path where a download performed today, should be placed.
     # Effectively, we take the base {#output_directory} set from our configuration file,
-    # and append a path component that the provided date. Callers can then append
-    # a CSV filename to this existing path to have a fully qualified path to write to.
+    # and optionally append a path component of the provided date. The decision to include
+    # a path component (sub-folder) for the date is determined by @create_subfolders_by_date.
+    #
+    # Callers can then append a CSV filename to this existing path to have a
+    # fully qualified path to write to.
     #
     # @param  [Time] date The timestamp we'll use to extract a date from.
     # @return [String] The base path a filename can be appended to, for writing to today.
     def csv_directory(date = Time.now)
-      date_segment = date.strftime('%Y-%m-%d')
-      path = File.join(@output_directory, date_segment)
-      expanded_path = File.expand_path path
+      if @create_subfolders_by_date
+        date_segment = date.strftime('%Y-%m-%d')
+        path = File.join(@output_directory, date_segment)
+      else
+        path = @output_directory
+      end
+
+      File.expand_path path
     end
 
 
@@ -222,6 +231,7 @@ module Mixpanel
       @output_directory = config.output_directory
       @from_days_ago = config.from_days_ago
       @to_days_ago = config.to_days_ago
+      @create_subfolders_by_date = config.create_subfolders_by_date?
     end
 
   end # class

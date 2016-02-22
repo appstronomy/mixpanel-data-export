@@ -55,6 +55,15 @@ module Util
     end
 
 
+    # Retrieves whether or not we should be saving downloaded files into folders
+    # based on the date they were run. Defaults to false.
+    #
+    # @return [Boolean] Whether sub-folders should be created by date.
+    def create_subfolders_by_date?
+      @config_info['Create Sub-folders by Date']
+    end
+
+
     # Loads our `Exporter.config.json` file to set the {#output_directory} instance variable.
     # @return [void]
     def load_configuration

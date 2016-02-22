@@ -1,5 +1,6 @@
 {
   "Output Directory": "~/Desktop/App Output/Mixpanel Export",
   "From Days Ago": 1,
-  "To Days Ago": 0
+  "To Days Ago": 0,
+  "Create Sub-folders by Date": false
 }
