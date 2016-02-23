@@ -64,6 +64,20 @@ module Util
     end
 
 
+    # Retrieves whether or not we should name downloaded files with the date range
+    # of the contained events. Defaults to true. If you set this to false, we will
+    # name files based on the date they were downloaded (which may have little to no
+    # bearing on when the contained events actually took place).
+    #
+    # If you set this to true, the actual dates implied by from_days_ago and to_days_ago
+    # will both show up in your downloaded file's name, even if they are the same.
+    #
+    # @return [Boolean] Whether event date ranges should be used in naming files.
+    def use_event_dates_in_filenames?
+      @config_info['Use Event Dates in Filenames']
+    end
+
+
     # Loads our `Exporter.config.json` file to set the {#output_directory} instance variable.
     # @return [void]
     def load_configuration

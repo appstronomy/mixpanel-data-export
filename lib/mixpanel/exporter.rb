@@ -43,6 +43,17 @@ module Mixpanel
     # @return [Fixnum]
     attr_reader :to_days_ago
 
+    # Whether to create sub-folders for each distinct download date,
+    # as given to us by {Util::ExporterConfig}
+    #
+    # @return [Boolean]
+    attr_reader :create_subfolders_by_date
+
+    # Whether to use event dates (as ranges) in the filenames of downloaded data,
+    # as given to us by {Util::ExporterConfig}
+    #
+    # @return [Boolean]
+    attr_reader :use_event_dates_in_filenames
 
 
     # Creates a new instance of Exporter, configured with our own Mixpanel::Service.
@@ -167,7 +178,19 @@ module Mixpanel
 
 
     # Builds the CSV filename for the specified event. The name is comprised
-    # of the event's name and the date.
+    # of the event's name and one or more dates.
+    #
+    # If @use_event_dates_in_filenames is true, we'll include a date range
+    # that represents from 'from' and 'to' date range given.
+    #
+    # @example
+    #   csv_filename('Survey Completed')
+    #   # When executed on July 12, 2016, with from_days_ago set to 5 and to_days_ago set to 3,
+    #   # this would generate the filename:
+    #   # 'SurveyCompleted.2016-07-07.2016-07-09.csv'
+    #
+    # If however, @use_event_dates_in_filenames is false, we'll just use the
+    # date that the script ran as the only date in the file.
     #
     # @example
     #   csv_filename('Survey Completed')
@@ -177,8 +200,19 @@ module Mixpanel
     # @param  [String] event The name of the event we are generating a filename for.
     # @return [String] A filename for writing CSV contents to, minus the full path.
     def csv_filename(event)
-      date_segment = Time.now.strftime('%Y-%m-%d')
-      "#{event.camelize.remove(' ')}.#{date_segment}.csv"
+      # Are we using the date range of the data being downloaded, as part of the filename?
+      if @use_event_dates_in_filenames
+        # YES: So we'll retrieve the 'from' and 'to' dates covered.
+        now = Date.today
+        from_date_segment = (now - @from_days_ago).to_time.strftime('%Y-%m-%d')
+        to_date_segment = (now - @to_days_ago).to_time.strftime('%Y-%m-%d')
+        "#{event.camelize.remove(' ')}.#{from_date_segment}.#{to_date_segment}.csv"
+      else
+        # NO: So we'll just use today's date in the filename, which will typically
+        # not map to the event data timestamps that will be contained in this file.
+        date_segment = Time.now.strftime('%Y-%m-%d')
+        "#{event.camelize.remove(' ')}.#{date_segment}.csv"
+      end
     end
 
 
@@ -237,6 +271,7 @@ module Mixpanel
       @from_days_ago = config.from_days_ago
       @to_days_ago = config.to_days_ago
       @create_subfolders_by_date = config.create_subfolders_by_date?
+      @use_event_dates_in_filenames = config.use_event_dates_in_filenames?
     end
 
   end # class
@@ -246,5 +281,5 @@ end # module
 
 # ---------- Development Testing ----------
 
-exporter = Mixpanel::Exporter.new
-exporter.start
+#exporter = Mixpanel::Exporter.new
+#exporter.start
