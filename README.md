@@ -33,7 +33,9 @@ You also specify the range of days in which data should be fetched from Mixpanel
 {
   "Output Directory": "~/Desktop/App Output/Mixpanel Export",
   "From Days Ago": 1,
-  "To Days Ago": 0
+  "To Days Ago": 0,
+  "Create Sub-folders by Date": false,
+  "Use Event Dates in Filenames" : true
 }
 ```
 
@@ -95,11 +97,19 @@ An illustration of what to expect when you run this command is below. Of course,
 
 ## Output Files
 
-A new directory is created for each day that the script is run. For example, if you run the script on July 30, 2016, you'll see a directory created with the name '2016-07-30'.
+If you set `Create Sub-folders by Date` to `true`, then a new directory is created for each day that the script is run. For example, if you run the script on July 30, 2016, you'll see a directory created with the name '2016-07-30'.
 
-A sibling directory is also created if need be, called 'logs'. Each day's run appends to a dated log file. 
+By default however, all files are dropped into your output directory, without any sub-folder segmentation.
 
-Similarly, the CSV files generated will always use today's date. Each event creates its own CSV file with data for just that event. If no data was downloaded for a particular event, then no CSV file is created for that event.
+A sub-directory of your output directory is also created if need be, called 'logs'. Each day's run appends to a dated log file. 
+
+Each downloaded file contains the name of the event it holds data for.
+
+If you set `Use Event Dates in Filenames` to `true`, then your downloaded event data will be named  with the date range reflecting the date range of the event data itself. If you set this to `false`, then the date of the download is what you'll find in the filename.
+
+Each event creates its own CSV file with data for just that event. If no data was downloaded for a particular event, then no CSV file is created for that event.
+
+The CSV file has columns sorted alphabetically, with the exception of the first column, which will always include the name of the event (the column is called *event*). The rest of the columns follow Ruby's standard sorting algorithm; special characters and numbers come first, then capital letters and then lower case letters.
 
 ## Development
 ### Programmer Documentation
@@ -125,6 +135,6 @@ See the [Changelog](https://github.com/appstronomy/mixpanel-data-export/blob/mas
 
 See the [Contributors](https://github.com/appstronomy/mixpanel-data-export/graphs/contributors) page for details.
 
-##Copyright
+## Copyright 
 
-Copyright (c) 2015+ [Appstronomy](http://appstronomy.com/), LLC. See [license](https://github.com/appstronomy/mixpanel-data-export/blob/master/LICENSE.txt) for details.
+Copyright (c) 2015-2016+ [Appstronomy](http://appstronomy.com/), LLC. See [license](https://github.com/appstronomy/mixpanel-data-export/blob/master/LICENSE.txt) for details.
