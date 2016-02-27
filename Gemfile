@@ -1,7 +1,10 @@
 # Mixpanel Data Export Gemfile
 # ----------------------------
 
-ruby '2.1.2'  # Note: 2.2.1 has issues compiling the redcarpet gem on a Mac, so Ruby 2.1.2 is recommended.
+# Notes:
+# * Ruby 2.2.1 has issues compiling the redcarpet gem on a Mac, so Ruby 2.1.2 is recommended.
+# * Conversely, Ruby 2.2.1 seems to work better on the latest Ubuntu distributions.
+ruby '2.1.2'
 source 'https://rubygems.org'
 
 # Execution
