@@ -71,10 +71,27 @@ module Mixpanel
     # to download data for each event.
     def start
       @logger.info 'Started Mixpanel Data Export process.'
-      @event_names = @service.event_names
+
+      # Retrieve the name of all known events:
+      all_event_names = @service.event_names
+
+      # Exclude or include a subset of events:
+      if @events_to_exclude.count > 0
+        @event_names = all_event_names - @events_to_exclude
+        @logger.info "Requested to exclude events: #{@events_to_exclude.inspect}."
+      elsif @events_to_include.count > 0
+        @event_names = all_event_names & @events_to_include
+        @logger.info "Requested to include events: #{@events_to_include.inspect}."
+      else
+        @event_names = all_event_names
+      end
+
+      # Log what we will be using:
       @logger.info "Will attempt download for the following events: #{@event_names.inspect}"
       @logger.info "Sending output to '#{csv_directory}'."
       @logger.info "Using date range {from days ago: #{@from_days_ago}, to days ago: #{@to_days_ago}}."
+
+      # Kick off the download of one event at a time:
       @event_names.each do |event|
         download event
       end
@@ -118,7 +135,16 @@ module Mixpanel
         json_array = data_array.map { |row| JSON.parse(row) }
         # Build a list of header keys from ALL rows of data retrieved, in case some
         # data points had no values for a subset of properties:
-        headers = json_array.map {|row| row['properties'].keys }.flatten.uniq
+        mapped_header_keys = json_array.map do |row|
+          if row['properties']
+            row['properties'].keys
+          else
+            @logger.warn "No properties found for event '#{event}' with row information: '#{row}'."
+            []
+          end
+        end
+
+        headers = mapped_header_keys.flatten.uniq
         @logger.info "Retrieved #{data_array.length} records for event '#{event}'."
         create_csv event, json_array, headers unless data_array.empty?
       else
@@ -272,6 +298,8 @@ module Mixpanel
       @to_days_ago = config.to_days_ago
       @create_subfolders_by_date = config.create_subfolders_by_date?
       @use_event_dates_in_filenames = config.use_event_dates_in_filenames?
+      @events_to_exclude = config.events_to_exclude || []
+      @events_to_include = config.events_to_include || []
     end
 
   end # class
@@ -281,5 +309,5 @@ end # module
 
 # ---------- Development Testing ----------
 
-#exporter = Mixpanel::Exporter.new
-#exporter.start
+# exporter = Mixpanel::Exporter.new
+# exporter.start

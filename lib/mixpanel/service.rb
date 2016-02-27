@@ -41,7 +41,18 @@ module Mixpanel
     #
     # You are strongly advised to keep this at `60` seconds or less. However,
     # you will likely need to increase this during any development/debugging.
-    DEFAULT_REQUEST_EXPIRY_SECONDS = 60
+    DEFAULT_REQUEST_EXPIRY_SECONDS        = 60
+
+    # The number of seconds maximum, that scaled request expiry can grow to.
+    DEFAULT_MAX_REQUEST_EXPIRY_SECONDS    = 180
+
+    # The number of seconds to scale a request expiry, based on the date range.
+    DEFAULT_SCALE_REQUEST_SECONDS_PER_DAY = 1
+
+    # The minimum amount of time a request expiry can be set to. Applies when
+    # scaling is in effect.
+    MIN_REQUEST_EXPIRY_SECONDS            = 30
+
 
     BASE_API_PATH            = '/api/2.0'
     ENDPOINT_GENERAL_QUERIES = 'http://mixpanel.com'
@@ -60,6 +71,10 @@ module Mixpanel
     # We'll set this up with the endpoint Mixpanel advises for non-data export queries.
     attr_reader :general_connection
 
+    # Will default to DEFAULT_REQUEST_EXPIRY_SECONDS. You can override this if you'd
+    # like a shorter or longer expiry.
+    attr_accessor :request_expiry_seconds
+
 
     # ---------- Initializing ----------
 
@@ -67,8 +82,9 @@ module Mixpanel
     # for each of the two Mixpanel endpoints.
     def initialize
       configure_logging
-      @general_connection  = Util::Connection.new(ENDPOINT_GENERAL_QUERIES)
-      @export_connection   = Util::Connection.new(ENDPOINT_DATA_EXPORT)
+      load_configuration
+      @general_connection     = Util::Connection.new(ENDPOINT_GENERAL_QUERIES)
+      @export_connection      = Util::Connection.new(ENDPOINT_DATA_EXPORT)
       load_credentials
     end
 
@@ -151,6 +167,9 @@ module Mixpanel
     #         (even when multiple are present).
     #
     def export(from_days_ago = 1, to_days_ago = 0, options = {})
+      # Record how many days a span this request is for:
+      @num_days_in_request = from_days_ago - to_days_ago
+
       from_date_token = from_days_ago.day.ago.strftime('%Y-%m-%d')
       to_date_token = to_days_ago.day.ago.strftime('%Y-%m-%d')
 
@@ -223,8 +242,22 @@ module Mixpanel
     end
 
 
+    def request_expiry_seconds
+      if @scale_request_expiry
+        num_seconds = @scale_request_seconds_per_day * (@num_days_in_request || 0)
+        num_seconds = [num_seconds, MIN_REQUEST_EXPIRY_SECONDS].max
+        num_seconds = [num_seconds, @max_scaled_request_expiry_seconds].min
+      else
+        num_seconds = @unscaled_request_expiry_seconds
+      end
+
+      @logger.info "Using request expiry of #{num_seconds.round} seconds."
+      num_seconds.round
+    end
+
+
     def request_expiry_timestamp
-      Time.now.to_i + DEFAULT_REQUEST_EXPIRY_SECONDS
+      Time.now.to_i + request_expiry_seconds
     end
 
 
@@ -262,6 +295,21 @@ module Mixpanel
 
       @api_key = credentials['API Key']
       @api_secret = credentials['API Secret']
+    end
+
+
+    # ---------- Configuration ----------
+
+    # Sets various instance attributes related to events to include/exclude, as well
+    # as request expiry timing, by consulting with the {ExporterConfig} class.
+    #
+    # @return [void]
+    def load_configuration
+      config = Util::ExporterConfig.new
+      @scale_request_expiry = config.scale_request_expiry
+      @scale_request_seconds_per_day = config.scale_request_seconds_per_day
+      @unscaled_request_expiry_seconds = config.unscaled_request_expiry_seconds || DEFAULT_REQUEST_EXPIRY_SECONDS
+      @max_scaled_request_expiry_seconds = config.max_scaled_request_expiry_seconds || DEFAULT_MAX_REQUEST_EXPIRY_SECONDS
     end
 
   end # class

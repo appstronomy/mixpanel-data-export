@@ -35,7 +35,13 @@ You also specify the range of days in which data should be fetched from Mixpanel
   "From Days Ago": 1,
   "To Days Ago": 0,
   "Create Sub-folders by Date": false,
-  "Use Event Dates in Filenames" : true
+  "Use Event Dates in Filenames" : true,
+  "Events to Exclude" : ["Data Imported", "Notification Received"],
+  "Events to Include" : [],
+  "Scale Request Expiry" : true,
+  "Scale Request Seconds Per Day" : 1.3,
+  "Unscaled Request Expiry Duration in Seconds" : 80,
+  "Maximum Scaled Request Expiry Duration in Seconds" : 200
 }
 ```
 
@@ -43,7 +49,23 @@ The `From Days Ago` is for how many days back the **start** of the export range 
 
 The `To Days Ago` is for how many days back the **end** of the export range is.
 
-The recommended configuration is to use the defaults shown above, where you are always retrieving *yesterday's* data. 
+The `Create Sub-folders by Date` takes a boolean value. We recommend setting this to `false`, so that all of the event data across multiple dates, sits inside a single folder. If you do set this to `true`, then files we be placed in subfolders named after the date of download.
+
+The `Use Event Dates in Filenames` determines whether we use the date range of the events being downloaded, in the actual filenames of the downloaded event data. We recommend setting this to `true`. Doing so will give you filenames with both the start and end date in the filename. Setting this to `false` means that the only date in the filename will be the date that the file was downloaded.
+
+The `Events to Exclude` is an optional array of the names of events that you do *not* want to be downloaded. If you provide a non-empty array here, we'll also ignore the value you set for the mutually exclusive property `Events to Include`.
+
+The `Events to Include` is mutually exclusive with the property `Events to Exclude`. If you provide a non-empty array for this property, we'll *only* download those events.
+
+The `Scale Request Expiry` has a Boolean setting. We recommend setting this to `true`. Doing so, allows us to scale the request expiry timeout to be proportionate to the number of days you are downloading data for. Asking for data spanning weeks or months will take longer than asking for data from just yesterday. We don't unilaterally set a high number for the request expiry, because doing so is a potential security risk; anyone else who sniffs the request URL could re-issue it to obtain your data. Mixpanel [tutorials](https://mixpanel.com/docs/api-documentation/a-tutorial-on-exporting-data) generally use 10 minutes (600 seconds). We err on the side of being more conservative.
+
+The `Scale Request Seconds Per Day` lets you define how generous a timeout you desire, in a formulaic manner. For example, if you set this to 0.5 and issue a query spanning 200 days, you will then have set an expiry of 100 seconds. Note that the tool has a minimum request expiry duration of 30 seconds, since most requests, event for just a single day's worth of data, take several seconds.
+
+The `Unscaled Request Expiry Duration in Seconds` is what the tool will consult if you set  `Scale Request Expiry` to `false`. It is an absolute number that will be used across the board for request expiry. If you go this route, we suggest using `60` seconds if you plan to make requests spanning less than a few days. For requests that can span months, you should use something closer to `400` seconds. The Mixpanel data export web service can be really slow when querying data older than a few days.
+
+The `Maximum Scaled Request Expiry Duration in Seconds` is the cap we should apply to the request expiry duration when `Scale Request Expiry` is set to `true`. This protects the tool from inadvertently calculating an expiry duration into hours (creating a security risk). Instead, we'll always cap the request expiry duration at this value.
+
+The recommended configuration is to use the defaults shown above for `From Days Ago` and `To Days Ago`, where you are always retrieving *yesterday's* data. 
 
 Schedule this script to run daily, and you'll always download the latest data available, without any gaps in your collected data.
 

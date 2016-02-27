@@ -3,5 +3,11 @@
   "From Days Ago": 1,
   "To Days Ago": 0,
   "Create Sub-folders by Date": false,
-  "Use Event Dates in Filenames" : true
+  "Use Event Dates in Filenames" : true,
+  "Events to Exclude" : [],
+  "Events to Include" : [],
+  "Scale Request Expiry" : true,
+  "Scale Request Seconds Per Day" : 1.1,
+  "Unscaled Request Expiry Duration in Seconds" : 80,
+  "Maximum Scaled Request Expiry Duration in Seconds" : 400
 }
