@@ -4,13 +4,13 @@
 # Notes:
 # * Ruby 2.2.1 has issues compiling the redcarpet gem on a Mac, so Ruby 2.1.2 is recommended.
 # * Conversely, Ruby 2.2.1 seems to work better on the latest Ubuntu distributions.
-ruby '2.1.2'
+ruby '3.0.2'
 source 'https://rubygems.org'
 
 # Execution
-gem 'i18n', '~> 0.6.9'
+gem 'i18n'
 gem 'activesupport'
-gem 'json', '1.8.2'
+gem 'json'
 gem 'logging'
 
 # Documentation
