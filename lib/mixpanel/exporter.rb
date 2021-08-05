@@ -232,12 +232,12 @@ module Mixpanel
         now = Date.today
         from_date_segment = (now - @from_days_ago).to_time.strftime('%Y-%m-%d')
         to_date_segment = (now - @to_days_ago).to_time.strftime('%Y-%m-%d')
-        "#{event.camelize.remove(' ')}.#{from_date_segment}.#{to_date_segment}.csv"
+        "#{event.camelize.delete(' ')}.#{from_date_segment}.#{to_date_segment}.csv"
       else
         # NO: So we'll just use today's date in the filename, which will typically
         # not map to the event data timestamps that will be contained in this file.
         date_segment = Time.now.strftime('%Y-%m-%d')
-        "#{event.camelize.remove(' ')}.#{date_segment}.csv"
+        "#{event.camelize.delete(' ')}.#{date_segment}.csv"
       end
     end
 
